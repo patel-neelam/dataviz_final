@@ -203,21 +203,32 @@ def create_final_df(file_name):
 
 df_all_data = create_final_df('df_all_data.csv')
 
+###### Calculate Broadband Penetration/Coverage by State
+
+df_all_data['coverage_count'] = df_all_data['Broadband_Avail_FCC'].apply(lambda x: 1 if x >= 0.95 else 0)
+
+df_sum = df_all_data.groupby(['State'])[['coverage_count']].agg(['sum','count']).reset_index()
+df_sum.columns = df_sum.columns.droplevel(0)
+df_sum['percent_coverage'] = df_sum['sum']/df_sum['count']
+df_sum = df_sum.rename(columns={'': 'State'})
+
 ###### Summary Tables
 
 # Source: https://stackoverflow.com/questions/22233488/pandas-drop-a-level-from-a-multi-level-column-index
 
-def summary_by_state(df, file_name):
+def summary_by_state(df, df2, file_name):
     df = df.groupby(['State', 'Policy_ind']).agg(['mean']).reset_index()
     df.columns = df.columns.droplevel(1)
-    drops = ['County_ID', 'Metro_ind', 'Farm_ind', 'plan_count']
+    drops = ['County_ID', 'Metro_ind', 'Farm_ind', 'plan_count', 'coverage_count']
     df = df.drop(drops, axis=1)
+    df3 = df.merge(df_sum, how='outer', on='State') 
+    df = df3
     df.sort_values(by=['State'])
     df.to_csv(os.path.join(path, file_name), index=False)
 
     return df
 
-df_by_state = summary_by_state(df_all_data, 'df_by_state.csv')
+df_by_state = summary_by_state(df_all_data, df_sum, 'df_by_state.csv')
 
 
 ###### Plotting
