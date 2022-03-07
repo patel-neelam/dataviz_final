@@ -1,5 +1,5 @@
-# PPHA 30536
-# Autumn 2021
+# PPHA 30560
+# Winter 2022
 # Final Project
 
 # Neelam Patel
@@ -20,7 +20,7 @@ import statsmodels.formula.api as smf
 from functools import reduce
 
 
-path = r'/Users/neelampatel/Documents/GitHub/final-project-neelam-patel'
+path = r'/Users/neelampatel/Documents/GitHub/dataviz_final'
 
 # Source:https://stackoverflow.com/questions/28144529/how-to-check-if-file-already-exists-if-not-download-on-python
 
@@ -83,14 +83,12 @@ def naco_data_scraper(data_map, year, ind, csv_name):
     return df
 
 df_internet_providers_2015 = naco_data_scraper('Transportation_Infrastructure', 2015, 'TRN_BC_Number_of_Internet_Providers', 'TRN_BC_Number_of_Internet_Providers_2015.csv')
-df_total_housing_2020 = naco_data_scraper('Demographics', 2020, 'DEM_2020Census_HousingUnits_Total', 'Total_Housing_2020.csv')
-df_usda_rural_dev_2016 = naco_data_scraper('Federal_Funding', 2016, 'FED_USDA_Amount', 'USDA_Rural_Dev_2016.csv')
 df_poverty_rate_2019 = naco_data_scraper('Health_Human_Services', 2019, 'HHS_SAIPE_Poverty_Rate', 'Poverty_Rate_2019.csv')
 
 ###### Merge Naco Data into DF
 # Source: https://stackoverflow.com/a/44338256
 
-naco_dfs = [df_internet_providers_2015, df_total_housing_2020, df_usda_rural_dev_2016, df_poverty_rate_2019]
+naco_dfs = [df_internet_providers_2015, df_poverty_rate_2019]
 df_naco_merged = reduce(lambda left, right: pd.merge(left, right, on=['FIPS'],
                                                      how='outer'), naco_dfs)
 ###### format and clean data
@@ -193,8 +191,7 @@ def create_final_df(file_name):
 
     cols = df_all_data.columns.tolist()
     cols = ['County_ID', 'State', 'County_name_x', 'Metro_ind', 'Farm_ind', 'Policy_ind', 'Broadband_Avail_FCC', 
-            'Broadband_Usage', 'TRN_BC_Number_of_Internet_Providers', 'DEM_2020Census_HousingUnits_Total', 
-            'FED_USDA_Amount', 'HHS_SAIPE_Poverty_Rate', 'mean', 'count']
+            'Broadband_Usage', 'TRN_BC_Number_of_Internet_Providers', 'HHS_SAIPE_Poverty_Rate', 'mean', 'count']
     df_all_data = df_all_data[cols]
     df_all_data = df_all_data.rename(columns={'mean': 'mean_plan_price',
                                               'count': 'plan_count',
@@ -222,28 +219,6 @@ def summary_by_state(df, file_name):
 
 df_by_state = summary_by_state(df_all_data, 'df_by_state.csv')
 
-def summary_by_policy(df, file_name):
-    df = df.groupby(['Policy_ind']).agg(['mean']).reset_index()
-    df.columns = df.columns.droplevel(1)
-    drops = ['County_ID', 'Metro_ind', 'Farm_ind', 'plan_count']
-    df = df.drop(drops, axis=1)
-    df.to_csv(os.path.join(path, file_name), index=False)
-
-    return df
-
-df_by_policy = summary_by_policy(df_all_data, 'df_by_policy.csv')
-
-def summary_by_farm(df, file_name):
-    df = df.groupby(['State', 'Farm_ind']).agg(['mean']).reset_index()
-    df.columns = df.columns.droplevel(1)
-    drops = ['County_ID', 'Metro_ind', 'plan_count']
-    df = df.drop(drops, axis=1)
-    df.sort_values(by=['State'])
-    df.to_csv(os.path.join(path, file_name), index=False)
-
-    return df
-
-df_by_farm = summary_by_farm(df_all_data, 'df_by_farm.csv')
 
 ###### Plotting
 
@@ -285,99 +260,3 @@ def merge_spatial_data(df, df_shp, df_shp_merge_col, df_merge_col, file_name):
 df_by_county_plot = merge_spatial_data(df_all_data, df_us_shp, 'GEOID', 'County_ID', 'df_by_county_plot.csv')
 #df_by_state_plot = merge_spatial_data(df_by_state, df_state_shp, 'STUSPS', 'State', 'df_by_state_plot.csv')
 
-### Generate and export plots 
-
-def generate_scatterplot_by_policytype(x, y, title, x_label, y_label):     
-    fig, ax = plt.subplots(figsize=(12, 6))
-
-    for type, group in df_by_state.groupby('Policy_ind'):
-        ax.scatter(group[x], group[y], label=type)
-
-    ax.set_title(title, fontsize=14)
-    ax.set_xlabel(x_label, fontsize=12)
-    ax.set_ylabel(y_label, fontsize=12)
-    ax.legend(loc='best', fontsize=12)
-    ax.legend(['No municipal broadband restrictions', 'municipal broadband restrictions'])
-
-    fig.savefig(os.path.join(path, title))
-    return fig, ax
-
-generate_scatterplot_by_policytype('TRN_BC_Number_of_Internet_Providers', 'mean_plan_price',
-                                   'United States Average Lowest Priced Plan Price by Number of Providers',
-                                   'Average # of Providers (By State)', 'Average Lowest Priced Plan')
-
-generate_scatterplot_by_policytype('TRN_BC_Number_of_Internet_Providers', 'Broadband_Usage',
-                                   'United States Average Broadband Usage by Number of Providers',
-                                   'Average # of Providers (By State)', 'Average Broadband Usage Rate')
-
-# Source: https://matplotlib.org/stable/tutorials/text/annotations.html
-
-def generate_histogram(df, var, title):
-    fig, ax = plt.subplots(figsize=(12, 4))
-
-    high_vals_collected = np.clip(df_all_data[var], None, 20)
-
-    n, bins, patches = ax.hist(high_vals_collected,
-                               bins=20, edgecolor='black', rwidth=0.8)
-    ax.set_ylabel('# of Counties')
-    ax.set_xlabel('# of Internet Providers')
-    ax.set_title(title)
-
-    from matplotlib.ticker import FormatStrFormatter
-    ax.xaxis.set_major_formatter(FormatStrFormatter('%0.0f'))
-
-    bin_w = (max(bins) - min(bins)) / (len(bins) - 1)
-    ax.set_xticks(np.arange(min(bins)+bin_w/2, max(bins), bin_w))
-    ax.set_xlim(bins[0], bins[-1]);
-    ax.annotate('20 or more', xy=(19, 100),  xycoords='data',
-                xytext=(0.8, 0.95), textcoords='axes fraction',
-                arrowprops=dict(facecolor='black', shrink=0.01),
-                horizontalalignment='right', verticalalignment='top',
-                )
-    fig.savefig(os.path.join(path, title))
-
-    return fig, ax
-
-generate_histogram(df_all_data, 'TRN_BC_Number_of_Internet_Providers',
-                   'Number of Internet Providers By County')
-
-def generate_boxplot(df, x, y, x_label, y_label, hue, hue_label, title):
-    sns.set_theme(style="whitegrid")
-    fig, ax = plt.subplots(figsize=(10, 6))
-    ax = sns.boxplot(x=x, y=y, orient="h", hue=hue, data=df, palette='Paired')
-    ax.set_title(title, fontsize=13)
-    ax.set_xlabel(x_label, fontsize=12)
-    ax.set_ylabel(y_label, fontsize=12)
-    ax.legend(title=hue_label)
-    fig.savefig(os.path.join(path, title))
-
-    return fig, ax
-
-generate_boxplot(df_all_data, 'TRN_BC_Number_of_Internet_Providers',
-                 'Farm_ind', '# of Internet Providers', 'Farm County Indicator (1)',
-                 'Policy_ind', 'Policy Indicator', 'Distribution of Internet Providers By County')
-
-###### Linear Regression Model
-
-
-def run_ols_model(parameters, file_name):
-
-    model = smf.ols(parameters, data=df_all_data)
-    result = model.fit()
-    rs = result.summary()
-
-    #Source: https://stackoverflow.com/questions/51734180/converting-statsmodels-summary-object-to-pandas-dataframe
-    results_as_html = rs.tables[1].as_html()
-    df = pd.read_html(results_as_html, header=0, index_col=0)[0]
-    df.to_csv(os.path.join(path, file_name))
-    print(rs)
-    return df
-
-provider_ols = run_ols_model('TRN_BC_Number_of_Internet_Providers ~ Metro_ind + Farm_ind + Policy_ind + FED_USDA_Amount + np.log(HHS_SAIPE_Poverty_Rate) + DEM_2020Census_HousingUnits_Total',
-                             'Internet Providers OLS.csv')
-
-broadband_avail_ols = run_ols_model('Broadband_Avail_FCC ~ Metro_ind + Farm_ind + Policy_ind + FED_USDA_Amount + np.log(HHS_SAIPE_Poverty_Rate) + DEM_2020Census_HousingUnits_Total',
-                                    'Broadband Availability OLS.csv')
-
-price_ols = run_ols_model('mean_plan_price ~ Metro_ind + Farm_ind + Policy_ind + FED_USDA_Amount + np.log(HHS_SAIPE_Poverty_Rate) + DEM_2020Census_HousingUnits_Total',
-                          'Lowest Priced Plan OLS.csv')
