@@ -116,28 +116,28 @@
 
 
 
-    d3.csv("largest_districts.csv").then(function (data) {
-        
+    d3.csv("df_all_data.csv").then(function (data) {
+        console.log(data)
 
         data.forEach(function (row) {
-            row.ses = +row.ses
-            row.mnav3poolgcs = +row.mnav3poolgcs
-            row.totavg = +row.totavg
+            row.TRN_BC_Number_of_Internet_Providers = +row.TRN_BC_Number_of_Internet_Providers
+            row.mean_plan_price = +row.mean_plan_price
+            row.plan_count = +row.plan_count
         })
-        console.log("loaded")
+        console.log(data)
 
         let margin = { top: 0, right: 0, bottom: 10, left: 30 };
 
         let x = d3.scaleLinear()
-            .domain(d3.extent(data.map(function (d) { return d.ses })))
+            .domain(d3.extent(data.map(function (d) { return d.TRN_BC_Number_of_Internet_Providers })))
             .range([margin.left, width - margin.right])
 
         let y = d3.scaleLinear()
-            .domain(d3.extent(data.map(function (d) { return d.mnav3poolgcs })))
+            .domain(d3.extent(data.map(function (d) { return d.mean_plan_price })))
             .range([height - margin.bottom, margin.top])
 
         var r = d3.scaleSqrt()
-            .domain([0, d3.max(data, function (d) { return d.totavg; })])
+            .domain([0, d3.max(data, function (d) { return d.plan_count; })])
             .range([1, 50]);
 
         let tickLabels = ["2 yrs. behind", "1 yr behind", "Average", "1 yr. ahead", "2 yrs. ahead", "3 yrs. ahead"];
@@ -163,14 +163,14 @@
             .attr("text-anchor", "start")
             .attr("x", margin.left)
             .attr("y", height + 10)
-            .text("← Poorer Districts");
+            .text("← Less Providers");
 
         svg.append("text")
             .attr("class", "x label")
             .attr("text-anchor", "end")
             .attr("x", width)
             .attr("y", height + 10)
-            .text("Richer Districts →");
+            .text("More Providers →");
 
         let shuffled = d3.shuffle(data); //trick
 
@@ -194,10 +194,10 @@
             .selectAll(".points")
             .data(shuffled)
             .join("circle")
-            .attr("class", function (d) { return "points p-" + d.leaidC }) // Give circles a class name.
-            .attr("cx", function (d) { return x(d.ses) }) //callback to access the data, position according to x axis
-            .attr("cy", function (d) { return y(d.mnav3poolgcs) })
-            .attr("r", function (d) { return r(d.totavg) })
+            .attr("class", function (d) { return "points p-" + d.County_ID }) // Give circles a class name.
+            .attr("cx", function (d) { return x(d.TRN_BC_Number_of_Internet_Providers) }) //callback to access the data, position according to x axis
+            .attr("cy", function (d) { return y(d.mean_plan_price) })
+            .attr("r", function (d) { return r(d.plan_count) })
             .style("stroke", "#333333")
             .style("stroke-width", .5)
             .style("opacity", 1)
@@ -213,7 +213,7 @@
                 .style("fill", "#c0cad8")
                 .style("fill-opacity", .5)
 
-            svg.select(".p-" + d.leaidC)
+            svg.select(".p-" + d.County_ID)
                 .style("stroke", "black")
                 .style("stroke-width", 2)
                 .style("fill", "yellow")
@@ -224,10 +224,10 @@
                 .domain([0]) //make sure to put this in brackets!
                 .range(["below", "above"])
 
-            let diff = +d.mnav3poolgcs - 3
+            let diff = +d.mean_plan_price - 59.28
 
-            let lang = "In " + d.newname + ", " + d.nyt_abbrev + " the typical 3rd grade student scored "
-            lang += d3.format(".1f")(Math.abs(diff)) + " years " + reScaleLang(diff) + " his or her grade level."
+            let lang = "In " + d.County_name + ", " + d.State + " the average internet plan price is $"
+            lang += d3.format(".2f")(Math.abs(diff)) + " " + reScaleLang(diff) + " the national average."
 
             popup
                 .style("opacity", 1)
