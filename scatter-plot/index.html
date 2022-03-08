@@ -70,6 +70,7 @@
             pointer-events: none;
             background-color: white;
             padding: 10px;
+            font-size: 12px;
         }
 
         .annotation {
@@ -87,7 +88,7 @@
 <body>
     <div class="chart-container">
         <h1 class="headline">
-            Test Scores for 3rd Grade in 2000 Large Districts
+            Average Internet Plan Price By County
         </h1>
 
 
@@ -140,10 +141,10 @@
             .domain([0, d3.max(data, function (d) { return d.plan_count; })])
             .range([1, 50]);
 
-        let tickLabels = ["2 yrs. behind", "1 yr behind", "Average", "1 yr. ahead", "2 yrs. ahead", "3 yrs. ahead"];
+        let tickLabels = ["$0", "$50", "$100", "$150", "$200", "$250"];
 
         let yAxisSettings = d3.axisLeft(y) 
-            .ticks(5) 
+            .ticks(6) 
             .tickSize(-width) 
             .tickFormat((d, i) => tickLabels[i])
             .tickPadding(10) 
@@ -172,7 +173,8 @@
             .attr("y", height + 10)
             .text("More Providers →");
 
-        let shuffled = d3.shuffle(data); //trick
+        let shuffled = d3.shuffle(data.filter(d => d.mean_plan_price !=0)); //trick
+        console.log(shuffled)
 
         let yAxisTicks = svg.append("g")
             .attr("class", "y axis")
@@ -182,8 +184,8 @@
         let zeroline = svg.append("line") 
             .attr("x1", margin.left)
             .attr("x2", width)
-            .attr("y1", y(3))
-            .attr("y2", y(3))
+            .attr("y1", y(58.24))
+            .attr("y2", y(58.24))
             .style("stroke", "#333")
             .style("stroke-width", "1")
             .style("opacity", 1)
@@ -215,9 +217,9 @@
 
             svg.select(".p-" + d.County_ID)
                 .style("stroke", "black")
-                .style("stroke-width", 2)
-                .style("fill", "yellow")
-                .style("fill-opacity", 1)
+                .style("stroke-width", 1.25)
+                .style("fill", "lightcoral")
+                .style("fill-opacity", .8)
                 .raise()
 
             let reScaleLang = d3.scaleThreshold()
@@ -226,13 +228,13 @@
 
             let diff = +d.mean_plan_price - 59.28
 
-            let lang = "In " + d.County_name + ", " + d.State + " the average internet plan price is $"
+            let lang = "In " + d.County_name + ", " + d.State + " there are " + d.plan_count + " different internet plans and the average price is $"
             lang += d3.format(".2f")(Math.abs(diff)) + " " + reScaleLang(diff) + " the national average."
 
             popup
                 .style("opacity", 1)
                 .style("left", (event.x - 100) + "px")
-                .style("top", (event.y - 150) + "px")
+                .style("top", (event.y - 125) + "px")
                 .html(lang)
 
         })
