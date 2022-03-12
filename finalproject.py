@@ -202,7 +202,7 @@ def create_final_df(file_name):
                                               'count': 'plan_count',
                                               'County_name_x': 'County_name'})
     df_all_data.sort_values(by=['County_ID'])
-    df_all_data.to_csv(os.path.join(path, file_name), index=False)
+    #df_all_data.to_csv(os.path.join(path, file_name), index=False)
 
     return df_all_data
 
@@ -229,7 +229,7 @@ def summary_by_state(df, df2, file_name):
     df3 = df.merge(df_sum, how='outer', on='State') 
     df = df3
     df.sort_values(by=['State'])
-    df.to_csv(os.path.join(path, file_name), index=False)
+    #df.to_csv(os.path.join(path, file_name), index=False)
 
     return df
 
