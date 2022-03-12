@@ -236,5 +236,11 @@ def summary_by_state(df, df2, file_name):
 df_by_state = summary_by_state(df_all_data, df_sum, 'df_by_state.csv')
 
 
-
+### Plotting
+sns.set_style('whitegrid')
+df_density = df_broadbandnow_clean.groupby(['County', 'State'])['WiredCount_2020'].agg(['mean', 'count']).reset_index()
+sns.displot(df_density['mean'], kde=True)
+sns.displot(df_all_data['TRN_BC_Number_of_Internet_Providers'], kde=True)
+sns.displot(df_broadbandnow_clean['WiredCount_2020'], kde=True)
+sns.kdeplot(df_broadbandnow_clean['WiredCount_2020'], bw=0.2)
 
