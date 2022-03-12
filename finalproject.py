@@ -128,6 +128,11 @@ def clean_df_format():
 
 df_microsoft_clean, df_ers_clean, df_broadbandnow_clean = clean_df_format()
 
+df_broadbandnow_clean.info()
+df_broadbandnow_clean['%Access to Terrestrial Broadband'] = df_broadbandnow_clean['%Access to Terrestrial Broadband'].str.strip('%')
+df_broadbandnow_clean['%Access to Terrestrial Broadband'] = pd.to_numeric(df_broadbandnow_clean['%Access to Terrestrial Broadband'])/100
+
+
 ###### Merge county-level dataframes and add policy indicator
 
 # Source: https://stackoverflow.com/questions/44826282/python-how-to-remove-words-from-a-string
@@ -231,43 +236,5 @@ def summary_by_state(df, df2, file_name):
 df_by_state = summary_by_state(df_all_data, df_sum, 'df_by_state.csv')
 
 
-###### Plotting
 
-### Extract US shapefile
-
-# Source: https://medium.com/@loldja/reading-shapefile-zips-from-a-url-in-python-3-93ea8d727856
-
-def get_zip(file_url, file_name):
-    url = file_url
-    fname = url.split('/')[-1].split('.')[0]
-    if not os.path.isfile(os.path.join(path, fname, '.shp')):
-        url_zip = requests.get(url)
-        zipfile = ZipFile(BytesIO(url_zip.content))
-        zipfile.extractall(path=os.path.join(path, 'County_shapefiles'))
-        df_shp = geopandas.read_file(os.path.join(path, 'County_shapefiles', file_name))
-    else:
-        df_shp = geopandas.read_file(os.path.join(path, 'County_shapefiles', file_name))
-
-    df_shp['GEOID'] = pd.to_numeric(df_shp['GEOID'])
-
-    return df_shp
-
-df_us_shp = get_zip(r'https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_us_county_5m.zip',
-                    'cb_2020_us_county_5m.shp')
-df_state_shp = get_zip(r'https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_us_state_5m.zip',
-                      'cb_2020_us_state_5m.shp')
-
-### Merge data
-
-def merge_spatial_data(df, df_shp, df_shp_merge_col, df_merge_col, file_name):
-
-    df_merged = df_shp.merge(df, left_on=df_shp_merge_col, right_on=df_merge_col, how='left')
-    df_merged = df_merged[~df_merged.STUSPS.isin(['AK', 'HI', 'AS', 'GU', 'MP', 'PR', 'VI'])].reset_index(drop=True)
-
-    df_merged.to_csv(os.path.join(path, file_name), index=False)
-
-    return df_merged
-
-df_by_county_plot = merge_spatial_data(df_all_data, df_us_shp, 'GEOID', 'County_ID', 'df_by_county_plot.csv')
-#df_by_state_plot = merge_spatial_data(df_by_state, df_state_shp, 'STUSPS', 'State', 'df_by_state_plot.csv')
 
