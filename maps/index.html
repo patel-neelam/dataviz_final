@@ -22,15 +22,17 @@
             font-size: 36px;
             font-family: 'SourceSans' sans-serif;
             font-weight: 500;
+            
         }
         .grid-example {
             display: grid;
-            grid-template-columns: 60% 60%;
-            row-gap: 25px;
+            grid-template-columns: 55% 55%;
+            row-gap: 20px;
             column-gap: 10px;
+            align-self: center;
         }
         .note {
-            font-size: 16px;
+            font-size: 14px;
             font-family: 'SourceSans' sans-serif;
             font-weight: 500;
         }
@@ -43,11 +45,13 @@
 <body>
     <div class="chart-container">
         <h1 class="headline">
+            <center>
             <b>United States County Broadband Statistics for 2020</b>
+            </center>
         </h1>
         <div class="plots">
-            <img src="densityplot.svg" width=75%>
-            <img src="scatterplot.svg" width=75%>
+            <center><img src="densityplot.svg" width=75%></center>
+            <center><img src="scatterplot.svg" width=75%></center>
         </div>
         <div class="grid-example">
             <img src="penetration.svg">
@@ -55,17 +59,13 @@
             <img src="fiber.svg">
             <img src="noaccess _new.svg">
         </div>
-
+        <br></br>
+        <br></br>
+        <br></br>
         <div class="note">
             Note: These visualizations are based on a <a href="https://broadbandnow.com/research/county-broadband-statistics">report</a> 
             originally created by Julia Tanberk from BroadbandNow. 
         </div>
 
-        <!-- <div class="grid-example">
-            <img src="county-map2.svg">
-            <img src="county-map2.svg">
-            <img src="county-map2.svg">
-            <img src="county-map2.svg">
-        </div> -->
     </div>
 </body>
