@@ -19,25 +19,36 @@
 
 
         h1 {
-            /* border: 2px solid green; */
+            font-size: 36px;
+            font-family: 'SourceSans' sans-serif;
+            font-weight: 500;
         }
         .grid-example {
             display: grid;
-            grid-template-columns: 900px;
-            row-gap: 50px;
-            column-gap: 50px;
+            grid-template-columns: 60% 60%;
+            row-gap: 25px;
+            column-gap: 10px;
         }
-        img {
-            width: 100%;
+        .note {
+            font-size: 16px;
+            font-family: 'SourceSans' sans-serif;
+            font-weight: 500;
         }
+        /* img {
+            width: 90%;
+        } */
     </style>
 </head>
 
 <body>
     <div class="chart-container">
         <h1 class="headline">
-            D3 starter template
+            <b>United States County Broadband Statistics for 2020</b>
         </h1>
+        <div class="plots">
+            <img src="densityplot.svg" width=75%>
+            <img src="scatterplot.svg" width=75%>
+        </div>
         <div class="grid-example">
             <img src="penetration.svg">
             <img src="competition.svg">
@@ -45,9 +56,9 @@
             <img src="noaccess _new.svg">
         </div>
 
-        <div>
-            Nullam quis risus eget urna mollis ornare vel eu leo. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Donec ullamcorper nulla non metus auctor fringilla. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            Nullam quis risus eget urna mollis ornare vel eu leo. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Donec ullamcorper nulla non metus auctor fringilla. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        <div class="note">
+            Note: These visualizations are based on a <a href="https://broadbandnow.com/research/county-broadband-statistics">report</a> 
+            originally created by Julia Tanberk from BroadbandNow. 
         </div>
 
         <!-- <div class="grid-example">
