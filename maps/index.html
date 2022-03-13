@@ -30,15 +30,21 @@
             row-gap: 20px;
             column-gap: 10px;
             align-self: center;
+            margin-left: auto;
+            margin-right: auto;
         }
         .note {
             font-size: 14px;
             font-family: 'Source Sans Pro', sans-serif;
             font-weight: 300;
         }
-        /* img {
-            width: 90%;
-        } */
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
     </style>
 </head>
 
@@ -50,8 +56,8 @@
             </center>
         </h1>
         <div class="plots">
-            <center><img src="densityplot.svg" width=75%></center>
-            <center><img src="scatterplot.svg" width=75%></center>
+            <img src="densityplot.svg" width=75%>
+            <img src="scatterplot.svg" width=75%>
         </div>
         <div class="grid-example">
             <img src="penetration.svg">
